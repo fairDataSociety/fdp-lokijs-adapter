@@ -33,13 +33,14 @@
   },
   "homepage": "https://github.com/fairDataSociety/fdp-lokijs-adapter#readme",
   "dependencies": {
+    "@ethersphere/bee-js": "^5.0.0",
     "@ethersphere/swarm-cid": "^0.1.0",
-    "@fairdatasociety/beeson": "0.1.1",
+    "@fairdatasociety/beeson": "^0.1.1",
     "@fairdatasociety/beeson-multiformats": "^1.0.3",
     "@fairdatasociety/fdp-storage": "^0.5.1",
-    "@fairdatasociety/fdp-storage-blockstore": "^0.1.0",
+    "@types/elliptic": "^6.4.14",
     "@types/lokijs": "^1.5.7",
-    "blockstore-core": "^2.0.1",
+    "elliptic": "^6.5.4",
     "keccak256": "^1.0.6",
     "lokijs": "^1.5.12",
     "multiformats": "^9.8.1"

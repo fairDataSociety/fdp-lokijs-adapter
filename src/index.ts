@@ -1,3 +1,4 @@
+import { makeChunkedFile } from '@fairdatasociety/bmt-js'
 import { FdpStorage } from '@fairdatasociety/fdp-storage'
 import { BeeSon } from '@fairdatasociety/beeson'
 import { codec, hasher } from '@fairdatasociety/beeson-multiformats'
@@ -6,7 +7,9 @@ import { JsonValue } from '@fairdatasociety/beeson/dist/types'
 import { Reference } from '@ethersphere/swarm-cid'
 import { CID } from 'multiformats/cid'
 import { FeedDB } from './feeddb'
-import { getCidFromBeeson } from '@fairdatasociety/fdp-storage-blockstore'
+import * as digest from 'multiformats/hashes/digest'
+import { getCurrentTime } from './swarm-feeds/getIndexForArbitraryTime'
+import { FeedSequencerOptions } from './feedsequencer'
 
 export interface SaveDatabaseCallbackArgs {
   reference: Reference
@@ -18,12 +21,25 @@ export interface LoadDatabaseCallbackArgs {
 }
 
 /**
+ * Get CID from Beeson helper
+ * @param beeson beeson value
+ * @returns A CID
+ */
+export async function getCidFromBeeson(beeson: BeeSon<JsonValue>): Promise<CID> {
+  const value = beeson.serialize()
+  const chunk = makeChunkedFile(value)
+  const ref = chunk.address()
+
+  return CID.decode(digest.create(0x1b, ref).digest)
+}
+
+/**
  * fdp storage Loki DB Adapter
  */
 export class LokiFDPAdapter {
   db: FeedDB
-  constructor(private fdp: FdpStorage, private username: string, private namespace: string) {
-    this.db = new FeedDB(this.fdp, this.username, namespace)
+  constructor(private fdp: FdpStorage, dbname: string, private options: FeedSequencerOptions) {
+    this.db = new FeedDB(this.fdp, dbname, options)
   }
 
   async saveDatabase(
@@ -33,7 +49,7 @@ export class LokiFDPAdapter {
   ) {
     try {
       // encode a block
-      const res = await this.db.getTopic().put(value)
+      const res = await this.db.getTopic().put(value, { at: getCurrentTime() })
       const cid = await getCidFromBeeson(value)
 
       callback(null, { reference: res as Reference, cid })

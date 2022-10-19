@@ -1,20 +1,28 @@
-import { FeedReader, FeedWriter } from '@ethersphere/bee-js'
+import { Signer } from '@ethersphere/bee-js'
 import { FeedUploadOptions } from '@ethersphere/bee-js/dist/types/feed'
 import { Reference } from '@ethersphere/swarm-cid'
 import { BeeSon } from '@fairdatasociety/beeson'
 import { JsonValue } from '@fairdatasociety/beeson/dist/types'
 import { FdpStorage } from '@fairdatasociety/fdp-storage'
+import { SwarmStreamingFeedR, SwarmStreamingFeedRW } from './swarm-feeds/streaming'
+import { StreamingFeed } from './swarm-feeds/streaming-feed'
+
+export interface FeedSequencerOptions {
+  init: number
+  updateInterval: number
+}
 
 /**
  * Feed sequence helper class
  */
 export class FeedSequencer {
-  private writer: FeedWriter
-  private reader: FeedReader
+  private writer: SwarmStreamingFeedRW
+  private reader: SwarmStreamingFeedR
 
-  constructor(topic: string, username: string, private fdp: FdpStorage) {
-    this.reader = fdp.connection.bee.makeFeedReader('sequence', topic, username)
-    this.writer = fdp.connection.bee.makeFeedWriter('sequence', topic, username)
+  constructor(private fdp: FdpStorage, public topic: string, private options: FeedSequencerOptions) {
+    const streamingFeed = new StreamingFeed(fdp.connection.bee as any, 'fault-tolerant-stream')
+    this.reader = streamingFeed.makeFeedR(topic, fdp.account.wallet?.address as string)
+    this.writer = streamingFeed.makeFeedRW(topic, fdp.connection.bee.signer as Signer)
   }
 
   /**
@@ -23,13 +31,16 @@ export class FeedSequencer {
    * @param options feed upload options
    * @returns feed response
    */
-  async put(data: BeeSon<JsonValue>, options?: FeedUploadOptions) {
-    // eslint-disable-next-line no-console
-    console.log(data)
+  async put(data: BeeSon<JsonValue>, options: FeedUploadOptions) {
     const d = data.serialize()
     const { reference } = await this.fdp.connection.bee.uploadData(this.fdp.connection.postageBatchId, d)
 
-    return this.writer.upload(this.fdp.connection.postageBatchId, reference, options)
+    return this.writer.setLastUpdate(
+      this.fdp.connection.postageBatchId,
+      reference,
+      options?.at as number,
+      this.options.updateInterval,
+    )
   }
 
   /**
@@ -37,7 +48,7 @@ export class FeedSequencer {
    * @param ref swarm reference
    * @returns
    */
-  async get(ref: Reference) {
+  async get(ref: Reference): Promise<any> {
     return this.fdp.connection.bee.downloadData(ref, undefined)
   }
 
@@ -46,9 +57,20 @@ export class FeedSequencer {
    * @param ref swarm reference
    * @returns
    */
-  async getLatest() {
-    const latest = await this.reader.download()
+  async getLatest(): Promise<any> {
+    const feedUpdate = await this.writer.findLastUpdate(this.options.init, this.options.updateInterval)
 
-    return this.get(latest.reference as Reference)
+    return feedUpdate.data
+  }
+
+  /**
+   * Reads latest data
+   * @param ref swarm reference
+   * @returns
+   */
+  async getUpdate(at: number): Promise<any> {
+    const feedUpdate = await this.writer.getUpdate(this.options.init, this.options.updateInterval, at)
+
+    return feedUpdate.data
   }
 }
