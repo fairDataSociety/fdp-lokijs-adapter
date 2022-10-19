@@ -37,6 +37,7 @@
     "@fairdatasociety/beeson": "0.1.1",
     "@fairdatasociety/beeson-multiformats": "^1.0.3",
     "@fairdatasociety/fdp-storage": "^0.5.1",
+    "@fairdatasociety/fdp-storage-blockstore": "^0.1.0",
     "@types/lokijs": "^1.5.7",
     "blockstore-core": "^2.0.1",
     "keccak256": "^1.0.6",

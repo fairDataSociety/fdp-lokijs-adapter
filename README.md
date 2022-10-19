@@ -1,6 +1,6 @@
-# fdp-storage-blockstore
+# fdp-lokijs-adapter
 
-FDP - Beeson IPLD Blockstore
+FDP LokiJS DB Adapter
 
 ## Usage
 

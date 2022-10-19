@@ -24,6 +24,8 @@ export class FeedSequencer {
    * @returns feed response
    */
   async put(data: BeeSon<JsonValue>, options?: FeedUploadOptions) {
+    // eslint-disable-next-line no-console
+    console.log(data)
     const d = data.serialize()
     const { reference } = await this.fdp.connection.bee.uploadData(this.fdp.connection.postageBatchId, d)
 

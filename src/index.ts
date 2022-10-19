@@ -6,6 +6,7 @@ import { JsonValue } from '@fairdatasociety/beeson/dist/types'
 import { Reference } from '@ethersphere/swarm-cid'
 import { CID } from 'multiformats/cid'
 import { FeedDB } from './feeddb'
+import { getCidFromBeeson } from '@fairdatasociety/fdp-storage-blockstore'
 
 export interface SaveDatabaseCallbackArgs {
   reference: Reference
@@ -32,10 +33,10 @@ export class LokiFDPAdapter {
   ) {
     try {
       // encode a block
-      const block = await Block.encode({ value, codec, hasher })
-      const res = await this.fdp.connection.bee.uploadData(this.fdp.connection.postageBatchId, block.bytes)
+      const res = await this.db.getTopic().put(value)
+      const cid = await getCidFromBeeson(value)
 
-      callback(null, { reference: res.reference as Reference, cid: block.cid })
+      callback(null, { reference: res as Reference, cid })
     } catch (err) {
       callback(err as Error)
     }

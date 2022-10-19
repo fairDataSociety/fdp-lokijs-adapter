@@ -1,6 +1,6 @@
 import { BatchId } from '@ethersphere/bee-js'
 import { FdpStorage } from '@fairdatasociety/fdp-storage'
-import { LokiFDPAdapter } from '../../src/lokifdp'
+import { LokiFDPAdapter } from '../../src/'
 import { LokiPartitioningAdapter } from 'lokijs'
 import loki from 'lokijs'
 describe('loki fdp adapter', () => {
@@ -55,6 +55,7 @@ describe('loki fdp adapter', () => {
     expect(results.length).toEqual(2)
 
     odin.age = 60
+    console.log(users.data)
     users.update(odin)
 
     const results2 = users.find({ age: { $gte: 59 } })
