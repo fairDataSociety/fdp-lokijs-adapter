@@ -10,9 +10,12 @@ describe('loki fdp adapter', () => {
     const id = `54ed0da82eb85ab72f9b8c37fdff0013ac5ba0bf96ead71d4a51313ed831b9e5` as BatchId
     const client = new FdpStorage('http://localhost:1633', id)
 
-    const idbAdapter = new LokiFDPAdapter(client, 'swarmbee', 'fdp')
+    const idbAdapter = new LokiFDPAdapter(client, 'swarmbee', {
+      init: new Date().getTime(),
+      updateInterval: 1000,
+    })
     const pa = new LokiPartitioningAdapter(idbAdapter, { paging: true })
-    db = new loki('sandbox.db', { adapter: pa, autosave: true, autosaveInterval: 5000 })
+    db = new loki('swarm.db', { adapter: pa, autosave: true, autosaveInterval: 1000 })
   })
 
   it('when created should be defined', async () => {
@@ -55,7 +58,6 @@ describe('loki fdp adapter', () => {
     expect(results.length).toEqual(2)
 
     odin.age = 60
-    console.log(users.data)
     users.update(odin)
 
     const results2 = users.find({ age: { $gte: 59 } })

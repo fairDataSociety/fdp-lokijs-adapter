@@ -1,13 +1,11 @@
 {
   "include": ["src"],
   "compilerOptions": {
-    "alwaysStrict": true,
     "target": "ES6",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
-    "module": "commonjs",
-    "strict": true,
+    "module": "CommonJS",
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

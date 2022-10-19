@@ -1,5 +1,6 @@
 import { Utils, Signer, Data } from '@ethersphere/bee-js'
-import { Bytes, HexString, makeBytes } from '@fairdatasociety/beeson/dist/utils'
+import { Bytes, makeBytes } from '@ethersphere/bee-js/dist/types/utils/bytes'
+import { HexString } from '@ethersphere/bee-js/dist/types/utils/hex'
 import { curve, ec } from 'elliptic'
 
 export const TOPIC_BYTES_LENGTH = 32
