@@ -1,8 +1,9 @@
 import { BatchId, Bee, Reference, Signer, Topic } from '@ethersphere/bee-js'
-import { Bytes } from '@fairdatasociety/beeson/dist/utils'
+import type { SingleOwnerChunk } from '@ethersphere/bee-js/dist/src/chunk/soc'
+import type { ChunkReference } from '@ethersphere/bee-js/dist/src/feed'
+import type { EthAddress } from '@ethersphere/bee-js/dist/src/utils/eth'
 import { SwarmFeedHandler } from './feed'
-import { SingleOwnerChunk } from './soc'
-import { ChunkReference, readUint64BigEndian, writeUint64BigEndian, serializeBytes } from './utils'
+import { Bytes, readUint64BigEndian, serializeBytes, writeUint64BigEndian } from './utils'
 
 export interface StreamingFeedChunk extends SingleOwnerChunk {
   index: number
@@ -22,7 +23,7 @@ export interface IStreamingFeed<Index> {
   /** get Feed interface with read operations */
   makeFeedR(
     topic: Topic | Uint8Array | string,
-    owner: Uint8Array | string,
+    owner: EthAddress | Uint8Array | string,
     ...options: any[]
   ): SwarmStreamingFeedR
   /** get Feed interface with write and read operations */

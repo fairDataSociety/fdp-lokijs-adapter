@@ -7,11 +7,7 @@ export const getCurrentTime = (d = new Date()) => d.getTime()
  * @param lookupTime lookup time
  * @returns Returns -1 if not found, otherwise the index
  */
-export const getIndexForArbitraryTime = (
-  lookupTime: number,
-  initialTime: number,
-  updatePeriod: number,
-): number => {
+export const getIndexForArbitraryTime = (lookupTime: number, initialTime: number, updatePeriod: number): number => {
   const currentTime = getCurrentTime() // Tp
 
   //  the nearest last index to an arbitrary time (Tx) where T0 <= Tx <= Tn <= Tp

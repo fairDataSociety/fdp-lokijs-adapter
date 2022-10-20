@@ -11,6 +11,7 @@
     "fs": false
   },
   "scripts": {
+    "prepare": "rimraf dist && npm run compile:types && npm run compile --env mode=production",
     "test": "jest --verbose",
     "test:unit": "jest --verbose --selectProjects=node:unit node:unit --config=jest.config.ts",
     "compile": "webpack --progress --env target=node",
@@ -35,7 +36,7 @@
   },
   "homepage": "https://github.com/fairDataSociety/fdp-lokijs-adapter#readme",
   "dependencies": {
-    "@ethersphere/bee-js": "^5.0.0",
+    "@ethersphere/bee-js": "^1.2.1",
     "@ethersphere/swarm-cid": "^0.1.0",
     "@fairdatasociety/beeson": "^0.1.1",
     "@fairdatasociety/beeson-multiformats": "^1.0.3",

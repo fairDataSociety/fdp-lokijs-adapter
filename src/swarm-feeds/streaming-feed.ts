@@ -1,5 +1,4 @@
 import { BatchId, Bee, Reference, Signer, Topic, Utils } from '@ethersphere/bee-js'
-import { Bytes } from '@fairdatasociety/beeson/dist/utils'
 import { makeTopic } from './feed'
 import { getCurrentTime, getIndexForArbitraryTime } from './getIndexForArbitraryTime'
 import {
@@ -11,13 +10,13 @@ import {
   SwarmStreamingFeedRW,
   FaultTolerantStreamType,
 } from './streaming'
-import { ChunkReference, hexToBytes, makeSigner, writeUint64BigEndian } from './utils'
+import { ChunkReference, makeSigner, writeUint64BigEndian } from './utils'
+
+const { Hex } = Utils
+const { hexToBytes } = Hex
 
 export class StreamingFeed implements IStreamingFeed<number> {
-  public constructor(
-    public readonly bee: Bee,
-    public type: FaultTolerantStreamType = 'fault-tolerant-stream',
-  ) {}
+  public constructor(public readonly bee: Bee, public type: FaultTolerantStreamType = 'fault-tolerant-stream') {}
 
   /**
    * Creates a streaming feed reader
@@ -25,11 +24,14 @@ export class StreamingFeed implements IStreamingFeed<number> {
    * @param owner owner
    * @returns a streaming feed reader
    */
-  public makeFeedR(topic: Topic | Uint8Array | string, owner: Uint8Array | string): SwarmStreamingFeedR {
+  public makeFeedR(
+    topic: Topic | Uint8Array | string,
+    owner: Utils.Eth.EthAddress | Uint8Array | string,
+  ): SwarmStreamingFeedR {
     const socReader = this.bee.makeSOCReader(owner)
     const topicHex = makeTopic(topic)
     const topicBytes = hexToBytes<32>(topicHex)
-    const ownerHex = socReader.owner
+    const ownerHex = Utils.Eth.makeHexEthAddress(owner)
 
     /**
      * Gets the last index in the feed
@@ -119,10 +121,7 @@ export class StreamingFeed implements IStreamingFeed<number> {
    * @param signer signer
    * @returns a streaming feed reader / writer
    */
-  public makeFeedRW(
-    topic: string | Topic | Uint8Array,
-    signer: string | Uint8Array | Signer,
-  ): SwarmStreamingFeedRW {
+  public makeFeedRW(topic: string | Topic | Uint8Array, signer: string | Uint8Array | Signer): SwarmStreamingFeedRW {
     const canonicalSigner = makeSigner(signer)
     const topicHex = makeTopic(topic)
     const topicBytes = hexToBytes<32>(topicHex)
@@ -194,7 +193,7 @@ export class StreamingFeed implements IStreamingFeed<number> {
    * @param index the chunk index
    * @returns a bytes 32
    */
-  public getIdentifier(topic: Bytes<32>, index: number): Bytes<32> {
+  public getIdentifier(topic: Utils.Bytes.Bytes<32>, index: number): Utils.Bytes.Bytes<32> {
     const indexBytes = writeUint64BigEndian(index)
 
     return Utils.keccak256Hash(topic, indexBytes)

@@ -1,6 +1,4 @@
-import { Utils, Signer, Data } from '@ethersphere/bee-js'
-import { Bytes, makeBytes } from '@ethersphere/bee-js/dist/types/utils/bytes'
-import { HexString } from '@ethersphere/bee-js/dist/types/utils/hex'
+import { Data, Signer, Utils } from '@ethersphere/bee-js'
 import { curve, ec } from 'elliptic'
 
 export const TOPIC_BYTES_LENGTH = 32
@@ -10,11 +8,14 @@ export const UNCOMPRESSED_RECOVERY_ID = 27
 type PlainChunkReference = Bytes<32>
 type EncryptedChunkReference = Bytes<64>
 
+export type Bytes<Length extends number = number> = Utils.Bytes.Bytes<Length>
+export type HexString<Length extends number = number> = Utils.Hex.HexString<Length>
 export type EllipticPublicKey = curve.base.BasePoint
+export type EthAddress = Utils.Eth.EthAddress
 export type Signature = Bytes<65>
 export type ChunkReference = PlainChunkReference | EncryptedChunkReference
 
-export function writeUint64BigEndian(value: number, bytes: Bytes<8> = makeBytes(8)): Bytes<8> {
+export function writeUint64BigEndian(value: number, bytes: Bytes<8> = Utils.Bytes.makeBytes(8)): Bytes<8> {
   const dataView = new DataView(bytes.buffer)
   const valueLower32 = value & 0xffffffff
 
@@ -24,10 +25,10 @@ export function writeUint64BigEndian(value: number, bytes: Bytes<8> = makeBytes(
   return bytes
 }
 
-function publicKeyToAddress(pubKey: EllipticPublicKey): Uint8Array {
+function publicKeyToAddress(pubKey: EllipticPublicKey): EthAddress {
   const pubBytes = pubKey.encode('array', false)
 
-  return Utils.keccak256Hash(pubBytes.slice(1)).slice(12) as Uint8Array
+  return Utils.keccak256Hash(pubBytes.slice(1)).slice(12) as EthAddress
 }
 
 function hashWithEthereumPrefix(data: Uint8Array): Bytes<32> {
@@ -65,7 +66,7 @@ export function defaultSign(data: Uint8Array, privateKey: Bytes<32>): Signature 
 
 export function makeSigner(signer: Signer | Uint8Array | string | unknown): Signer {
   if (typeof signer === 'string') {
-    const hexKey = new TextDecoder().decode(signer as unknown as Uint8Array)
+    const hexKey = Utils.Hex.makeHexString(signer, 64)
     const keyBytes = hexToBytes<32>(hexKey) // HexString is verified for 64 length => 32 is guaranteed
 
     return makePrivateKeySigner(keyBytes)
@@ -87,9 +88,9 @@ export function assertSigner(signer: unknown): asserts signer is Signer {
 
   const typedSigner = signer as Signer
 
-  // if (!isBytes(typedSigner.address, 20)) {
-  //   throw new TypeError("Signer's address must be Uint8Array with 20 bytes!")
-  // }
+  if (!Utils.Bytes.isBytes(typedSigner.address, 20)) {
+    throw new TypeError("Signer's address must be Uint8Array with 20 bytes!")
+  }
 
   if (typeof typedSigner.sign !== 'function') {
     throw new TypeError('Signer sign property needs to be function!')
@@ -104,7 +105,7 @@ export function assertSigner(signer: unknown): asserts signer is Signer {
 export function makePrivateKeySigner(privateKey: Bytes<32>): Signer {
   const curve = new ec('secp256k1')
   const keyPair = curve.keyFromPrivate(privateKey)
-  const address = publicKeyToAddress(keyPair.getPublic()) as any
+  const address = publicKeyToAddress(keyPair.getPublic())
 
   return {
     sign: (digest: Data) => defaultSign(digest, privateKey),
@@ -126,9 +127,9 @@ export function readUint64BigEndian(bytes: Bytes<8>): number {
  * @param hex string input without 0x prefix!
  */
 export function hexToBytes<Length extends number, LengthHex extends number = number>(
-  hex: HexString<LengthHex>,
-): Bytes<Length> {
-  return hexToBytes<Length>(hex)
+  hex: Utils.Hex.HexString<LengthHex>,
+): Utils.Bytes.Bytes<Length> {
+  return Utils.Hex.hexToBytes<Length>(hex)
 }
 
 /**
@@ -142,8 +143,8 @@ export function hexToBytes<Length extends number, LengthHex extends number = num
 export function bytesToHex<Length extends number = number>(
   bytes: Uint8Array,
   len?: Length,
-): HexString<Length> {
-  return bytesToHex<Length>(bytes, len)
+): Utils.Hex.HexString<Length> {
+  return Utils.Hex.bytesToHex<Length>(bytes, len)
 }
 
 /**
@@ -155,7 +156,7 @@ export function bytesToHex<Length extends number = number>(
  * @param length  The specified length
  */
 export function assertBytes<Length extends number>(b: unknown, length: Length): asserts b is Bytes<Length> {
-  return assertBytes<Length>(b, length)
+  return Utils.Bytes.assertBytes<Length>(b, length)
 }
 
 /**

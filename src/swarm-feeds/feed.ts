@@ -1,11 +1,11 @@
-import { BatchId, Bee, Reference, Signer, Topic } from '@ethersphere/bee-js'
-import { Bytes } from '@fairdatasociety/beeson/dist/utils'
-import { HexEthAddress } from '@fairdatasociety/fdp-storage/dist/utils/hex'
-import { SingleOwnerChunk } from './soc'
+import { BatchId, Bee, Reference, Signer, Topic, Utils } from '@ethersphere/bee-js'
+import type { SingleOwnerChunk } from '@ethersphere/bee-js/dist/src/chunk/soc'
+import type { ChunkReference } from '@ethersphere/bee-js/dist/src/feed'
+import type { EthAddress, HexEthAddress } from '@ethersphere/bee-js/dist/src/utils/eth'
 import {
   assertBytes,
+  Bytes,
   bytesToHex,
-  ChunkReference,
   hexToBytes,
   readUint64BigEndian,
   serializeBytes,
@@ -54,7 +54,7 @@ export interface SwarmFeed<Index> {
   /** get Feed interface with read operations */
   makeFeedR(
     topic: Topic | Uint8Array | string,
-    owner: Uint8Array | string,
+    owner: EthAddress | Uint8Array | string,
     ...options: any[]
   ): SwarmFeedR<Index>
   /** get Feed interface with write and read operations */
@@ -143,7 +143,7 @@ export function fetchIndexToInt(fetchIndex: string): number {
 
 export function makeTopic(topic: Uint8Array | string): Topic {
   if (typeof topic === 'string') {
-    return bytesToHex(new TextEncoder().encode(topic), TOPIC_HEX_LENGTH)
+    return Utils.Hex.makeHexString(topic, TOPIC_HEX_LENGTH)
   } else if (topic instanceof Uint8Array) {
     assertBytes<32>(topic, TOPIC_BYTES_LENGTH)
 

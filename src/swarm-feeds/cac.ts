@@ -1,5 +1,5 @@
-import { FlexBytes } from '@ethersphere/bee-js/dist/types/utils/bytes'
-import type { Bytes } from '@fairdatasociety/beeson/dist/utils'
+import { Utils } from '@ethersphere/bee-js'
+import { Bytes } from './utils'
 
 export type ChunkAddress = Bytes<32>
 
@@ -15,7 +15,7 @@ export type ChunkAddress = Bytes<32>
 export interface Chunk {
   readonly data: Uint8Array
   span(): Bytes<8>
-  payload(): FlexBytes<1, 4096>
+  payload(): Utils.Bytes.FlexBytes<1, 4096>
 
   address(): ChunkAddress
 }

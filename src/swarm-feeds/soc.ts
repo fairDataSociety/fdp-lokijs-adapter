@@ -1,6 +1,5 @@
-import { Bytes } from '@fairdatasociety/beeson/dist/utils'
 import { Chunk } from './cac'
-import { Signature } from './utils'
+import { Bytes, EthAddress, Signature } from './utils'
 
 export type Identifier = Bytes<32>
 
@@ -15,5 +14,5 @@ export type Identifier = Bytes<32>
 export interface SingleOwnerChunk extends Chunk {
   identifier: () => Identifier
   signature: () => Signature
-  owner: () => any
+  owner: () => EthAddress
 }

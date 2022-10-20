@@ -1,5 +1,5 @@
 import { Signer } from '@ethersphere/bee-js'
-import { FeedUploadOptions } from '@ethersphere/bee-js/dist/types/feed'
+import { FeedUploadOptions } from '@ethersphere/bee-js/dist/src/feed'
 import { Reference } from '@ethersphere/swarm-cid'
 import { BeeSon } from '@fairdatasociety/beeson'
 import { JsonValue } from '@fairdatasociety/beeson/dist/types'
