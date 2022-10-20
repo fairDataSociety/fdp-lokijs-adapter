@@ -4,7 +4,7 @@ import { Reference } from '@ethersphere/swarm-cid'
 import { BeeSon } from '@fairdatasociety/beeson'
 import { JsonValue } from '@fairdatasociety/beeson/dist/types'
 import { FdpStorage } from '@fairdatasociety/fdp-storage'
-import { SwarmStreamingFeedR, SwarmStreamingFeedRW } from './swarm-feeds/streaming'
+import { StreamingFeedChunk, SwarmStreamingFeedR, SwarmStreamingFeedRW } from './swarm-feeds/streaming'
 import { StreamingFeed } from './swarm-feeds/streaming-feed'
 
 export interface FeedSequencerOptions {
@@ -72,5 +72,16 @@ export class FeedSequencer {
     const feedUpdate = await this.writer.getUpdate(this.options.init, this.options.updateInterval, at)
 
     return feedUpdate.data
+  }
+
+  /**
+   * Reads latest data
+   * @param ref swarm reference
+   * @returns
+   */
+  async getUpdates(): Promise<StreamingFeedChunk[]> {
+    const chunks = await this.writer.getUpdates(this.options.init, this.options.updateInterval)
+
+    return chunks
   }
 }
