@@ -5,17 +5,18 @@ import { LokiPartitioningAdapter } from 'lokijs'
 import loki from 'lokijs'
 describe('loki fdp adapter', () => {
   let db: Loki
+  let adapter: LokiFDPAdapter
 
   beforeEach(() => {
     const id = `54ed0da82eb85ab72f9b8c37fdff0013ac5ba0bf96ead71d4a51313ed831b9e5` as BatchId
     const client = new FdpStorage('http://localhost:1633', id)
 
-    const idbAdapter = new LokiFDPAdapter(client, 'swarmbee', {
+    adapter = new LokiFDPAdapter(client, 'swarmbee', {
       init: new Date().getTime(),
-      updateInterval: 1000,
+      updateInterval: 100,
     })
-    const pa = new LokiPartitioningAdapter(idbAdapter, { paging: true })
-    db = new loki('swarm.db', { adapter: pa, autosave: true, autosaveInterval: 1000 })
+    const pa = new LokiPartitioningAdapter(adapter, { paging: true })
+    db = new loki('swarm.db', { adapter: pa, autosave: true, autosaveInterval: 100 })
   })
 
   it('when created should be defined', async () => {
